@@ -1,0 +1,163 @@
+---
+title: "第3章: ESM — 拡張セキュリティメンテナンス"
+description: esm-infraとesm-appsの仕組みと違いを詳しく解説
+---
+
+## ESMとは
+
+**ESM（Expanded Security Maintenance）** は、Ubuntu Proの**最も基本的で重要なサービス**です。
+
+通常5年間で終了するUbuntu LTSのセキュリティサポートを **10年間に延長** します。
+
+`pro status` で確認できる2つのESMサービス:
+
+```bash
+esm-apps         yes       enabled      Expanded Security Maintenance for Applications
+esm-infra        yes       enabled      Expanded Security Maintenance for Infrastructure
+```
+
+---
+
+## esm-infra と esm-apps の違い
+
+この2つは **対象となるリポジトリ** と **適用タイミング** が異なります。
+
+### esm-infra（Infrastructure）
+
+| 項目 | 内容 |
+|------|------|
+| **対象リポジトリ** | Main（中核パッケージ） |
+| **適用タイミング** | 通常サポート(5年)終了**後**に機能する |
+| **パッケージ数** | 約 2,300 |
+| **用途** | OSの基盤、カーネル、クラウドインフラ |
+
+```
+Ubuntu 24.04 における esm-infra の役割:
+
+2024 ────────── 2029 ────────── 2034
+  │  通常の5年サポート │  esm-infra が担当  │
+  │  (Canonicalが保守) │  (Mainの延長保守)   │
+  └────────────────────┘──────────────────────┘
+```
+
+:::note
+esm-infra は「infra（インフラストラクチャー）」の名前の通り、クラウドやサーバーの基盤として使うケースで特に重要です。Kubernetes、OpenStack、Cephなどの環境では、Universeのパッケージをあまり使わないため、esm-infraだけの低コストプランも存在します。
+:::
+
+### esm-apps（Applications）
+
+| 項目 | 内容 |
+|------|------|
+| **対象リポジトリ** | Universe（コミュニティパッケージ） |
+| **適用タイミング** | リリース直後**から** 10年間 |
+| **パッケージ数** | 約 36,000+ |
+| **用途** | 開発ツール、ライブラリ、アプリケーション |
+
+```
+Ubuntu 24.04 における esm-apps の役割:
+
+2024 ────────────────────────── 2034
+  │  esm-apps が最初から10年間カバー    │
+  │  (Universeの36,000+パッケージ)      │
+  └──────────────────────────────────────┘
+```
+
+:::caution[ここが重要な違い]
+**esm-infra** は5年目以降に「延長」として機能しますが、**esm-apps** はリリース直後から機能します。なぜなら、Universeリポジトリは通常のUbuntuではCanonicalによるセキュリティ保証がないためです。
+:::
+
+---
+
+## 2つのESMを図で比較
+
+```
+                  Year 1  2  3  4  5  6  7  8  9  10
+Main リポジトリ:  [===== 通常サポート =====][== esm-infra ==]
+                  (Canonical が無料で保守)  (Pro が保守)
+
+Universe リポジトリ: [========== esm-apps (Pro が保守) ==========]
+                     (通常Ubuntuでは保証なし → Proで10年保証)
+```
+
+---
+
+## 実際に何が起きているのか
+
+### ESMが有効な状態で apt update すると
+
+```bash
+$ sudo apt update
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-security InRelease
+Hit:4 https://esm.ubuntu.com/apps/ubuntu noble-apps-security InRelease  # ← esm-apps
+Hit:5 https://esm.ubuntu.com/infra/ubuntu noble-infra-security InRelease # ← esm-infra
+```
+
+`esm.ubuntu.com` からのセキュリティ更新リポジトリが追加されていることがわかります。
+
+### ESMによるパッチの例
+
+```bash
+# ESMで修正されたパッケージの確認
+$ pro security-status
+```
+
+このコマンドで、ESMによって何件のセキュリティパッチが適用されているかを確認できます。
+
+---
+
+## 家庭ユーザーにとっての意味
+
+### なぜ esm-apps が特に重要なのか
+
+家庭のデスクトップでは、**Universe リポジトリのパッケージを多く使う**傾向があります。
+
+```
+あなたが日常的に使う可能性のあるUniverseパッケージ:
+- Node.js, npm
+- PHP
+- Ruby
+- Redis
+- PostgreSQL
+- FFmpeg
+- ImageMagick
+- VLC (一部コーデック)
+- 多くのPythonライブラリ
+```
+
+これらすべてに **10年間のセキュリティ保証** が付くのがesm-appsの恩恵です。
+
+### 通常のUbuntuだけだとどうなるか
+
+```
+通常のUbuntuでUniverseパッケージを使う場合:
+
+✅ パッケージのインストール → 問題なし
+❌ セキュリティ脆弱性が見つかった時 → Canonicalの修正保証なし
+❌ 脆弱性の放置 → 攻撃のリスク
+```
+
+Ubuntu Proのesm-appsを有効にすることで:
+
+```
+✅ パッケージのインストール → 問題なし
+✅ セキュリティ脆弱性が見つかった時 → Canonicalが修正を提供
+✅ 自動更新で適用 → 安全が維持される
+```
+
+---
+
+## まとめ
+
+| 比較項目 | esm-infra | esm-apps |
+|----------|-----------|----------|
+| **対象** | Main リポジトリ | Universe リポジトリ |
+| **パッケージ数** | 約 2,300 | 約 36,000+ |
+| **適用タイミング** | 5年目以降 | リリース直後から |
+| **主な用途** | OS基盤、サーバーインフラ | 開発ツール、アプリケーション |
+| **家庭ユーザー** | 長期的にOS基盤を保守 | 日常使うソフトの安全性確保 |
+
+:::tip[結論]
+家庭ユーザーの場合、**esm-infra と esm-apps の両方を有効にしておくのがベストプラクティス**です。両方を有効化することで、Main・Universe両方のリポジトリが10年間カバーされます 👍
+:::

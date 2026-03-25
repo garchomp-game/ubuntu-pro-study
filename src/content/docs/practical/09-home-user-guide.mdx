@@ -1,0 +1,240 @@
+---
+title: "第9章: 家庭用PCでのUbuntu Pro活用ガイド"
+description: pro status を完全に理解し、最適な運用を行う
+---
+
+## この章のゴール
+
+`pro status` の**すべての行の意味を完全に理解**し、家庭用PCでの**最適なUbuntu Pro運用方法**を身につけることが目標です。
+
+---
+
+## pro status を完全解説
+
+```bash
+$ pro status
+SERVICE          ENTITLED  STATUS       DESCRIPTION
+anbox-cloud      yes       disabled     Scalable Android in the cloud
+esm-apps         yes       enabled      Expanded Security Maintenance for Applications
+esm-infra        yes       enabled      Expanded Security Maintenance for Infrastructure
+fips-updates     yes       disabled     FIPS compliant crypto packages with stable security updates
+landscape        yes       disabled     Management and administration tool for Ubuntu
+livepatch        yes       enabled      Canonical Livepatch service
+realtime-kernel* yes       disabled     Ubuntu kernel with PREEMPT_RT patches integrated
+usg              yes       disabled     Security compliance and audit tools
+
+Account: user@example.com
+Subscription: Ubuntu Pro - free personal subscription
+```
+
+### 一行ずつ解説
+
+| # | サービス | 状態 | 判定 | 解説 |
+|---|----------|------|:---:|------|
+| 1 | **esm-infra** | ✅ enabled | 👍 完璧 | Mainリポジトリの延長セキュリティ更新。10年サポート |
+| 2 | **esm-apps** | ✅ enabled | 👍 完璧 | Universe 36,000+パッケージのセキュリティ更新 |
+| 3 | **livepatch** | ✅ enabled | 👍 完璧 | カーネルの重大な脆弱性を再起動なしで修正 |
+| 4 | **fips-updates** | ❌ disabled | 👍 正しい | 米国政府向け暗号規格。家庭では不要 |
+| 5 | **landscape** | ❌ disabled | 👍 正しい | 大規模管理ツール。1台のPCには不要 |
+| 6 | **usg** | ❌ disabled | 👍 正しい | CIS/STIG監査ツール。家庭では不要 |
+| 7 | **realtime-kernel** | ❌ disabled | 👍 正しい | 産業/音楽制作向け。一般用途には不要 |
+| 8 | **anbox-cloud** | ❌ disabled | 👍 正しい | クラウドAndroid。デスクトップ用途外 |
+
+:::tip[推奨設定]
+**esm-infra、esm-apps、livepatch** の3つが有効で、それ以外は無効。家庭用デスクトップPCとして**理想的な設定**です。
+:::
+
+---
+
+## 家庭用PCでのUbuntu Proメリット まとめ
+
+### メリット1: 10年間のセキュリティ保証
+
+```
+Ubuntu 24.04 LTSの場合:
+
+通常サポートのみ:
+  2024 ────── 2029  (5年)
+  それ以降は脆弱性が修正されない
+
+Ubuntu Pro適用:
+  2024 ────── 2029 ────── 2034  (10年)
+  10年間にわたりセキュリティ更新を受けられる
+```
+
+**実際のメリット:**
+- OSの再インストールやアップグレードの頻度を減らせる
+- 同じ環境を長期間安定して使い続けられる
+- 5年以上使うPCでは確実に恩恵がある
+
+### メリット2: 36,000+パッケージのセキュリティカバー
+
+```
+日常的に使うソフトウェアの例:
+  Node.js    → Universe → esm-apps でカバー ✅
+  Python     → Main     → esm-infra でカバー ✅
+  PHP        → Universe → esm-apps でカバー ✅
+  PostgreSQL → Universe → esm-apps でカバー ✅
+  FFmpeg     → Universe → esm-apps でカバー ✅
+  ImageMagick → Universe → esm-apps でカバー ✅
+```
+
+### メリット3: 再起動なしのカーネル保護
+
+```
+Livepatchによる保護:
+  月曜日: 重大なカーネル脆弱性が公開 😱
+  月曜日: Livepatchが自動で修正 ✅
+  → 再起動を待たずに保護される
+  → 作業を中断する必要なし
+```
+
+### メリット4: 完全無料
+
+```
+料金: ¥0（個人利用、最大5台まで）
+```
+
+---
+
+## 有効にしていないサービスの判断基準
+
+### 判断フローチャート
+
+```
+サービスを有効にすべきか？
+
+fips-updates:
+  米国政府向けの暗号規格が必要？ → No → disabled のまま ✅
+
+landscape:
+  10台以上のUbuntuを管理する？ → No → disabled のまま ✅
+
+usg:
+  CIS/STIGのコンプライアンス監査が必要？ → No → disabled のまま ✅
+  (学習目的で「audit」だけ試すのはアリ)
+
+realtime-kernel:
+  DTM/プロオーディオ制作をする？ → Yes → 有効化を検討 🤔
+                                → No  → disabled のまま ✅
+
+anbox-cloud:
+  Androidをクラウドで実行する？ → No → disabled のまま ✅
+```
+
+---
+
+## 日常運用で知っておくべきこと
+
+### 1. 自動更新の確認
+
+Ubuntu Proのパッチは `unattended-upgrades` で自動適用されます。
+
+```bash
+# 自動更新が有効か確認
+cat /etc/apt/apt.conf.d/20auto-upgrades
+
+# 期待される出力:
+# APT::Periodic::Update-Package-Lists "1";
+# APT::Periodic::Unattended-Upgrade "1";
+```
+
+### 2. セキュリティ状態の確認
+
+```bash
+# Ubuntu Proのセキュリティ状態を確認
+pro security-status
+
+# 更新可能なパッケージの確認
+apt list --upgradable
+```
+
+### 3. 定期的なメンテナンス
+
+```bash
+# 月1回程度推奨:
+sudo apt update && sudo apt upgrade -y
+
+# その後、再起動が推奨される場合:
+# /var/run/reboot-required ファイルが存在するか確認
+cat /var/run/reboot-required 2>/dev/null && echo "再起動が推奨されます" || echo "再起動は不要です"
+```
+
+### 4. Pro サブスクリプションの管理
+
+```bash
+# Pro の詳細状態
+pro status --all
+
+# サブスクリプション情報
+pro status
+# → Account と Subscription の行を確認
+```
+
+---
+
+## よくある質問（FAQ）
+
+### Q: Ubuntu Proを入れるとPCが遅くなる？
+
+**A: いいえ。** Ubuntu Proは追加のリポジトリとLivepatchサービスを有効にするだけです。パフォーマンスへの影響はほぼゼロです。
+
+### Q: Ubuntu Proのサブスクリプションが切れたらどうなる？
+
+**A: すぐに危険になるわけではありません。** しかし、ESMのセキュリティ更新が受けられなくなります。個人無料プランは自動更新されるので、通常は心配不要です。
+
+### Q: Ubuntu以外のディストリビューション（Kubuntuなど）でも使える？
+
+**A: はい。** Kubuntu、Xubuntu、Ubuntu MATEなど、公式フレーバーでも使用できます。
+
+### Q: 5台の制限はどう数えられる？
+
+**A: 1つのUbuntuインスタンス（PC）= 1台** として数えられます。仮想マシンも1台としてカウントされます。
+
+### Q: 再インストールしたらどうなる？
+
+**A: 再度 `pro attach` コマンドでトークンを適用する**必要があります。Ubuntu Oneアカウントにログインすればトークンを確認できます。
+
+---
+
+## 最終まとめ: Ubuntu Proの全体像
+
+```
+Ubuntu Pro = Canonicalのセキュリティ強化サブスクリプション
+
+┌─────────────────────────────────────────────────────┐
+│                    Ubuntu Pro                        │
+│                                                     │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  ⭐ ESM (esm-infra + esm-apps)             │    │
+│  │  → 5年を超えるセキュリティ更新               │    │
+│  │  → Main + Universe の全パッケージをカバー     │    │
+│  │  → 家庭ユーザー: 必須 ✅                      │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  ⭐ Livepatch                               │    │
+│  │  → 再起動なしのカーネル脆弱性修正            │    │
+│  │  → 家庭ユーザー: 推奨 ✅                      │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  💼 FIPS / USG / Landscape / etc.            │    │
+│  │  → エンタープライズ向けのコンプライアンスツール │    │
+│  │  → 家庭ユーザー: 不要（知識としては有益）      │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  🎵 Realtime Kernel / 🤖 Anbox Cloud        │    │
+│  │  → 特殊用途向け                              │    │
+│  │  → 家庭ユーザー: 不要                        │    │
+│  └─────────────────────────────────────────────┘    │
+│                                                     │
+│  個人利用: 最大 5台まで 無料                       │
+└───────────────────────────────────────────────────────┘
+```
+
+:::note[お疲れさまでした]
+これで全9章の学習は完了です。Ubuntu Proの全体像、各サービスの意味、他のセキュリティ技術との違い、そして家庭用PCでの活用方法を体系的に理解できたはずです。
+
+:::

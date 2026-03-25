@@ -1,0 +1,56 @@
+---
+title: Ubuntu Pro Study へようこそ
+description: Ubuntu Proのすべてを体系的に学ぶドキュメントサイト
+template: splash
+hero:
+  tagline: Ubuntu Proとは何か？何ができるのか？家庭用PCでの活用法まで、体系的に学ぶ講義形式ガイド
+  actions:
+    - text: 第1章から始める
+      link: /basics/01-what-is-ubuntu-pro/
+      icon: right-arrow
+      variant: primary
+    - text: pro status の見方
+      link: /practical/09-home-user-guide/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## このサイトについて
+
+**Ubuntu Pro Study** は、Ubuntu Proを体系的に理解するための学習サイトです。
+
+「`pro status` を打ったら色々出てくるけど、それぞれ何なのかよくわからない…」  
+そんな疑問を解消するために、基礎から実践まで講義形式で解説します。
+
+### pro status の出力例
+
+```bash
+$ pro status
+SERVICE          ENTITLED  STATUS       DESCRIPTION
+anbox-cloud      yes       disabled     Scalable Android in the cloud
+esm-apps         yes       enabled      Expanded Security Maintenance for Applications
+esm-infra        yes       enabled      Expanded Security Maintenance for Infrastructure
+fips-updates     yes       disabled     FIPS compliant crypto packages with stable security updates
+landscape        yes       disabled     Management and administration tool for Ubuntu
+livepatch        yes       enabled      Canonical Livepatch service
+realtime-kernel* yes       disabled     Ubuntu kernel with PREEMPT_RT patches integrated
+usg              yes       disabled     Security compliance and audit tools
+
+Account: user@example.com
+Subscription: Ubuntu Pro - free personal subscription
+```
+
+この出力の一行一行の意味を、このサイトで完全に理解できるようにします。
+
+<CardGrid stagger>
+  <Card title="🔰 基礎編" icon="open-book">
+    Ubuntu Proの全体像と、セキュリティの基礎知識を学びます。CVE、リポジトリ、サポート期間など。
+  </Card>
+  <Card title="🛡️ サービス詳解" icon="setting">
+    ESM、Livepatch、FIPS、USGなど、各サービスの仕組みと役割を詳しく解説します。
+  </Card>
+  <Card title="🏠 実践編" icon="laptop">
+    Firewall・VPN・暗号化との違い、家庭用PCでの具体的な活用方法をまとめます。
+  </Card>
+</CardGrid>

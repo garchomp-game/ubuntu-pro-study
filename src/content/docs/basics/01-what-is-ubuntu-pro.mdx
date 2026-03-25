@@ -1,0 +1,123 @@
+---
+title: "第1章: Ubuntu Proとは何か"
+description: Ubuntu Proの全体像を理解する
+---
+
+## Ubuntu Proの正体
+
+**Ubuntu Pro** は、Canonical（Ubuntuの開発元）が提供する **セキュリティ・コンプライアンス強化サブスクリプション** です。
+
+:::note[重要なポイント]
+Ubuntu Proは「別のOS」ではありません。既存のUbuntu LTSに **追加レイヤーとして適用されるサービス** です。
+:::
+
+### 一言で言うと
+
+> 「Ubuntu LTSのセキュリティサポートを5年から10年（最大15年）に延長し、エンタープライズ向けのセキュリティ・コンプライアンスツールを提供するサービス」
+
+---
+
+## なぜUbuntu Proが必要なのか
+
+### 通常のUbuntu LTSのサポート
+
+Ubuntu LTS（Long Term Support）は、通常 **5年間** のセキュリティサポートが提供されます。
+
+```
+Ubuntu 24.04 LTS のサポート期間（通常）:
+2024年4月 ──────────────────── 2029年4月
+  ↑ リリース                      ↑ サポート終了
+  └─── 5年間のセキュリティ更新 ───┘
+```
+
+### Ubuntu Proを適用した場合
+
+```
+Ubuntu 24.04 LTS のサポート期間（Ubuntu Pro）:
+2024年4月 ── 2029年4月 ──────── 2034年4月 ──── 2039年4月
+  ↑ リリース    ↑ 通常終了        ↑ Pro終了      ↑ Legacy終了
+  └── 5年 ──┘└──── +5年 ESM ────┘└── +5年 ──┘
+              （合計10年）         （合計15年）
+```
+
+---
+
+## 料金体系
+
+### 個人利用は無料！
+
+| プラン | 台数 | 料金 |
+|--------|------|------|
+| Personal（個人利用） | 最大5台 | **無料** |
+| Ubuntu Community | 最大50台 | **無料**（コミュニティ貢献者向け） |
+| Enterprise Desktop | 無制限 | 有料（年額） |
+| Enterprise Server | 無制限 | 有料（年額） |
+
+個人ユーザーの場合、サブスクリプションは `Ubuntu Pro - free personal subscription` と表示され、**個人無料プラン**であることがわかります。
+
+:::tip[確認方法]
+```bash
+$ pro status
+# 出力の末尾に以下のような情報が表示されます:
+#   Account: user@example.com
+#   Subscription: Ubuntu Pro - free personal subscription
+```
+5台までの個人PCに無料で適用できます。
+:::
+
+---
+
+## `pro status` の読み方
+
+`pro status` コマンドの出力を理解しましょう。
+
+```bash
+SERVICE          ENTITLED  STATUS       DESCRIPTION
+esm-apps         yes       enabled      Expanded Security Maintenance for Applications
+```
+
+| カラム | 意味 |
+|--------|------|
+| **SERVICE** | サービス名 |
+| **ENTITLED** | サブスクリプションで利用権限があるか |
+| **STATUS** | 現在そのサービスが有効化されているか |
+| **DESCRIPTION** | サービスの簡単な説明 |
+
+### ステータスの種類
+
+- **enabled** — 有効化済み。PCでこのサービスが動作中
+- **disabled** — 利用権限はあるが、まだ有効化していない
+- **n/a** — その環境では利用できない
+
+---
+
+## Ubuntu Proが提供するサービス一覧
+
+`pro status` に表示される各サービスの概要です。
+
+| サービス | 状態 | 概要 | 家庭ユーザー向け |
+|----------|------|------|:---:|
+| **esm-infra** | ✅ enabled | Mainリポジトリの延長セキュリティ更新 | ⭐ 必須 |
+| **esm-apps** | ✅ enabled | Universeリポジトリのセキュリティ更新 | ⭐ 必須 |
+| **livepatch** | ✅ enabled | 再起動なしのカーネルパッチ | ⭐ 推奨 |
+| **fips-updates** | ❌ disabled | 暗号化コンプライアンス（政府向け） | 💭 教養として |
+| **landscape** | ❌ disabled | 大規模Ubuntu管理ツール | 🏢 企業向け |
+| **usg** | ❌ disabled | セキュリティ監査・ハードニング | 💭 教養として |
+| **realtime-kernel** | ❌ disabled | リアルタイムカーネル | 🎵 特殊用途 |
+| **anbox-cloud** | ❌ disabled | クラウドAndroid仮想化 | 🏢 企業向け |
+
+:::note
+この表の各サービスについて、第3章以降で詳しく解説します。
+:::
+
+---
+
+## まとめ
+
+- Ubuntu Proは **Canonicalが提供するセキュリティ強化サブスクリプション**
+- 既存のUbuntu LTSに **追加レイヤーとして適用** される（別のOSではない）
+- 個人利用は **最大5台まで無料**
+- 主な恩恵は **セキュリティサポート期間の延長**（5年→10年→15年）
+- すべてのサービスを有効にする必要はなく、**用途に応じて選択** する
+
+次の章では、Ubuntu Proを理解するために必要な **セキュリティの基礎知識** を学びます。
